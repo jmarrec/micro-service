@@ -1,0 +1,9 @@
+[requires]
+fmt/9.1.0@#811e918ca4b4e0b9ddd6d5a2883efa82
+cpprestsdk/2.10.18#df2f6ac88e47cadd9c9e8e0971e00d89
+openssl/1.1.1o#213dbdeb846a4b40b4dec36cf2e673d7
+boost/1.79.0#f664bfe40e2245fa9baf1c742591d582
+
+[generators]
+CMakeToolchain
+CMakeDeps

@@ -5,37 +5,39 @@ This is a sample that shows how to implement a micro-serivce on C++ using the C+
 
 ## How to build
 
-1. Install git, CMake, boost, openssl on your system, if you are using macOS this can be acomplished easily with the following command: 
+1. Install git, CMake, boost, openssl on your system, if you are using macOS this can be acomplished easily with the following command:
 
           $ brew install cmake git openssl boost zlib
-          
+
 2. Clone the repository.
-3. Execute the below command: 
+3. Execute the below command:
 
           $ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
-          
+
 4. Go to the directory micro-service/libs and execute the script: ```./build_dependencies.sh``` that'll clone the [C++ REST SDK](https://github.com/Microsoft/cpprestsdk) repository and will build the static version of the library, if you want to build the dynamic link version of the library just on the **build_dependencies.sh** script remove the flag: ```-DBUILD_SHARED_LIBS=OFF```.
 5. Go to the directory micro-service and type the following commands:
 
-          $ mkdir build
+          $ pip install conan==1.60.1
+          $ conan install . -pr:b=default -b missing -if build/ -of build/ -c tools.cmake.cmaketoolchain:generator=Ninja.
           $ cd build
-          $ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ..
-          
-6. Finally type the command:
+          $ cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE:STRING=Debug ..
+          $ ninja
 
-          $ make -j 8
-          
 7. On ```./build``` directory type and you should see the following output:
 
-          $ ./micro-service   
+          $ ./micro-service
           $ Modern C++ Microservice now listening for requests at: http://<your computer's IP>:6502/v1/ivmero/api
-             
-8. To perform a benchmark on the Modern C++ Microservice I had included two **lua** scritps which can be executed using [WRK2](https://github.com/giltene/wrk2) HTTP Benckmark Tool, using the following command:
 
-          $ ./wrk -c100 -t8 -d60s -s benchmark_microsvc.lua http://192.168.100.6:6502 --latency --rate 2000
-          
+8. In another terminal window, you can try a request
+
+          $ curl -X GET http://127.0.1.1:6502/v1/ivmero/api/service/test
+
+9. To perform a benchmark on the Modern C++ Microservice I had included two **lua** scritps which can be executed using [WRK2](https://github.com/giltene/wrk2) HTTP Benckmark Tool, using the following command:
+
+          $ ./wrk -c100 -t8 -d60s -s benchmark_microsvc.lua http://127.0.1.1:6502 --latency --rate 2000
+
    and see results similar to these:
-   
+
             Running 1m test @ http://192.168.100.16:6502
               8 threads and 100 connections
               Thread calibration: mean lat.: 1.524ms, rate sampling interval: 10ms
@@ -162,5 +164,5 @@ The results above will depend on the system where the test is executed and pleas
                -- comment the following line to avoid server's excesive I/O to console on heavy load
                -- io.write("response: \n" .. body .. "\n---------------------------------------------\n")
             end
-            
+
 You can copy from the results above the histogram's section following the [sample format found here](https://github.com/HdrHistogram/HdrHistogram/blob/master/GoogleChartsExample/example1.txt), save it into a file and see a nice graph unsing [HdrHistogram Ploter](http://hdrhistogram.github.io/HdrHistogram/plotFiles.html).
